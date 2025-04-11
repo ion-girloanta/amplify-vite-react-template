@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import { useAuthenticator } from '@aws-amplify/ui-react';
+import SignInSignUp from "./components/SignInSignUp";
 
 const client = generateClient<Schema>();
 
 function App() {
   const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
-  const { user, signOut } = useAuthenticator();
+  const { authStatus, user, signOut } = useAuthenticator();
   // const { signOut } = useAuthenticator();
   useEffect(() => {
     client.models.Todo.observeQuery().subscribe({
@@ -22,6 +23,11 @@ function App() {
   function deleteTodo(id: string) {
     client.models.Todo.delete({ id })
   }
+
+  if (authStatus !== "authenticated") {
+    return <SignInSignUp />;
+  }
+
 
   return (
     <main>
